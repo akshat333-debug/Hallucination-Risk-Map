@@ -36,10 +36,6 @@ st.markdown("""
 
 from src.visualizer import plot_radar_chart, plot_sunburst, create_interactive_network
 
-def configure_api_key():
-    if "GEMINI_API_KEY" in st.secrets: return st.secrets["GEMINI_API_KEY"]
-    return None
-
 @st.cache_resource
 def get_pipeline():
     if not os.path.exists("vector_index.faiss"): return None
@@ -47,22 +43,11 @@ def get_pipeline():
     return RiskAnalysisPipeline()
 
 # --- SIDEBAR ---
-api_key = configure_api_key()
-
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=60)
     st.markdown("### **Risk Map AI**")
+    st.caption("Status: 🟢 Offline Mode (Local)")
     
-    # TOGGLE
-    use_local = st.toggle("🔒 Use Local Model Only", value=False, help="Force offline generation & verification (No API usage)")
-    
-    if use_local:
-        st.caption("Status: 🟡 Offline Mode (Local CPU)")
-        active_key = None # Override key
-    else:
-        st.caption(f"Status: {'🟢 Online (API)' if api_key else '🟡 Offline Mode'}")
-        active_key = api_key
-
     selected_page = option_menu(
         "Menu", ["Dashboard", "Knowledge Base", "Settings"], 
         icons=['speedometer2', 'database', 'gear'], menu_icon="cast", default_index=0,
@@ -73,9 +58,9 @@ with st.sidebar:
 
 if selected_page == "Settings":
     st.header("⚙️ Configuration")
-    st.text_input("Gemini API Key", value=api_key if api_key else "", type="password", disabled=True)
-    if use_local:
-        st.info("🔒 Local Mode is ON. API Key will be ignored.")
+    st.info("System is running in pure Offline Mode. No API keys required.")
+    st.text("Embeddings: all-mpnet-base-v2")
+    st.text("Verifier: cross-encoder/nli-deberta-v3-base")
 
 elif selected_page == "Knowledge Base":
     st.header("📚 Knowledge Base")
@@ -91,34 +76,44 @@ elif selected_page == "Dashboard":
     st.markdown("<h1 style='text-align: center;'>🧠 Hallucination Risk Map</h1>", unsafe_allow_html=True)
 
     # --- TABS FOR MODE SELECTION ---
-    mode_tab1, mode_tab2 = st.tabs(["💬 Ask & Verify", "📋 Audit External Text"])
+    mode_tab1, mode_tab2 = st.tabs(["🔎 Search & Verify", "📋 Audit External Text"])
 
-    # === MODE 1: ASK & VERIFY (Standard RAG) ===
+    # === MODE 1: SEARCH & VERIFY (Extractive RAG) ===
     with mode_tab1:
         if "generated_answer" not in st.session_state: st.session_state["generated_answer"] = ""
         
-        question = st.text_input("", "What are the main risks?", placeholder="Ask your document...", key="q_input")
+        question = st.text_input("", "What is the capital of France?", placeholder="Ask your document...", key="q_input")
         
-        if st.button("🚀 Run Analysis", use_container_width=True, key="run_btn"):
+        if st.button("🚀 Run Search", use_container_width=True, key="run_btn"):
             pipeline = get_pipeline()
             if pipeline:
-                msg = "🤖 Local LLM Thinking..." if use_local or not active_key else "☁️ Gemini Thinking..."
-                with st.spinner(msg):
-                    ctx = pipeline.retriever.retrieve(question)
-                    from src.llm_client import generate_answer
-                    st.session_state["generated_answer"] = generate_answer(question, ctx, active_key, force_local=use_local)
-                    # Auto-trigger verification for generated answers
-                    st.session_state['results'] = pipeline.process(question, st.session_state["generated_answer"], active_key)
+                with st.spinner("🔍 Searching Local Knowledge Base..."):
+                    # 1. Retrieve
+                    ctx = pipeline.retriever.retrieve(question, k=3)
+                    
+                    if ctx:
+                        # 2. Extractive "Generation" (Take top result)
+                        # We use the top result as the "Answer" to verify and display
+                        top_answer = ctx[0]['text']
+                        if len(ctx) > 1: top_answer += " " + ctx[1]['text']
+                        
+                        st.session_state["generated_answer"] = top_answer
+                        
+                        # 3. Verify
+                        st.session_state['results'] = pipeline.process(question, st.session_state["generated_answer"])
+                    else:
+                        st.warning("No relevant information found in Knowledge Base.")
+                        st.session_state["generated_answer"] = ""
             else:
                 st.error("Build Index first!")
 
         if st.session_state["generated_answer"]:
-            st.markdown("### 📝 Generated Answer")
-            st.text_area("", st.session_state["generated_answer"], height=200, key="ans_display")
+            st.markdown("### 📝 Retrieved Answer")
+            st.info(st.session_state["generated_answer"])
 
     # === MODE 2: AUDIT EXTERNAL TEXT (Manual Paste) ===
     with mode_tab2:
-        st.info("Paste text from ChatGPT, Claude, or a human draft to verify it against your Knowledge Base.")
+        st.info("Paste text to verify it against your Knowledge Base.")
         
         col_q, col_txt = st.columns([1, 2])
         with col_q:
@@ -130,10 +125,8 @@ elif selected_page == "Dashboard":
             pipeline = get_pipeline()
             if pipeline and audit_text:
                 with st.spinner("🧠 Auditing external text..."):
-                    # Use the audit question if provided, else use the text itself as query context
                     query_context = audit_question if audit_question else audit_text[:100]
-                    st.session_state['results'] = pipeline.process(query_context, audit_text, active_key)
-                    # Clear generated answer so we focus on this result
+                    st.session_state['results'] = pipeline.process(query_context, audit_text)
                     st.session_state["generated_answer"] = "" 
             elif not pipeline:
                 st.error("Index not ready.")
@@ -141,16 +134,14 @@ elif selected_page == "Dashboard":
                 st.warning("Please paste some text first.")
 
     # --- SHARED RESULTS DASHBOARD ---
-    # This section appears regardless of which tab triggered the results
     if 'results' in st.session_state:
         res = st.session_state['results']
         st.divider()
         st.markdown("### 📊 Verification Report")
         
-        # Sunburst Summary
         st.plotly_chart(plot_sunburst(res['claims']), use_container_width=True, key="sunburst_main")
 
-        t1, t2, t3 = st.tabs(["🛡️ Risk Inspector", "🕸️ Graph", "✨ Auto-Fix"])
+        t1, t2, t3 = st.tabs(["🛡️ Risk Inspector", "🕸️ Graph", "✨ Clean Up"])
         
         with t1:
             for i, c in enumerate(res['claims']):
@@ -174,24 +165,17 @@ elif selected_page == "Dashboard":
 
         with t3:
             green_claims = [c['claim_text'] for c in res['claims'] if c['analysis']['color'] == 'green']
-            
-            # Prevent division by zero if no claims found
             total = len(res['claims'])
             score = int((len(green_claims)/total)*100) if total > 0 else 0
             
             st.metric("Factuality Score", f"{score}%")
             
             if score < 100 and total > 0:
-                if st.button("✨ Auto-Correct Hallucinations"):
-                    with st.spinner("Rewriting..."):
-                        from src.llm_client import rewrite_verified_answer
-                        # Use audit_question if available, otherwise generic prompt
-                        q_context = audit_question if 'audit_question' in locals() and audit_question else "the user query"
-                        
-                        new_ans = rewrite_verified_answer(q_context, green_claims, active_key)
-                        st.success("Fixed Answer Generated!")
-                        st.markdown(f"<div class='glass-card glow-green'>{new_ans}</div>", unsafe_allow_html=True)
+                # Local "Auto-Correct" -> Just show verified sentences
+                st.markdown("### 🧼 Verified Content Only")
+                clean_text = " ".join(green_claims) if green_claims else "No verified content available."
+                st.markdown(f"<div class='glass-card glow-green'>{clean_text}</div>", unsafe_allow_html=True)
             elif total == 0:
-                st.warning("No claims detected to fix.")
+                st.warning("No claims detected.")
             else:
                 st.success("Text is already 100% verified!")

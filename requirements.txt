@@ -6,7 +6,7 @@ torch
 numpy
 pandas
 pypdf
-google-generativeai
+
 rank_bm25
 transformers
 sentencepiece
