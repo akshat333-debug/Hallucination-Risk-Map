@@ -22,7 +22,7 @@ class RiskAnalysisPipeline:
         for claim in claims:
             # 2. Retrieve Evidence
             # Search for the claim text specifically
-            evidences = self.retriever.retrieve(claim.text, k=3)
+            evidences = self.retriever.retrieve(claim.text, k=5)
             
             # 3. Local Verification (DeBERTa)
             nli_scores = self.verifier.verify(claim.text, evidences)
