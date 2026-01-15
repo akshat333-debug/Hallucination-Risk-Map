@@ -1,0 +1,82 @@
+[
+    {
+        "question": "What is Apollo 11 known for?",
+        "answer": "Apollo 11 was the spaceflight that first landed humans on the Moon.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "Who was in the Apollo 11 crew?",
+        "answer": "Neil Armstrong and Buzz Aldrin were the American crew that landed on the Moon.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "When did Apollo 11 land?",
+        "answer": "Apollo 11 landed on July 20, 1969.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "What is Python?",
+        "answer": "Python is a snake living in the Amazon rainforest.",
+        "expected_risk": "red"
+    },
+    {
+        "question": "What is Machine Learning?",
+        "answer": "Machine learning is a type of coffee brewing technique.",
+        "expected_risk": "red"
+    },
+    {
+        "question": "Who landed on the moon?",
+        "answer": "Elon Musk was the first person to walk on the moon.",
+        "expected_risk": "red"
+    },
+    {
+        "question": "When was World War II?",
+        "answer": "World War II lasted from 1939 to 1945.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "Who fought in WWII?",
+        "answer": "It involved the Allies and the Axis powers.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "What is the Roman Empire?",
+        "answer": "The Roman Empire was a period of ancient Rome with territories around the Mediterranean.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "Who founded the Roman Empire?",
+        "answer": "Napoleon Bonaparte founded the Roman Empire in 1804.",
+        "expected_risk": "red"
+    },
+    {
+        "question": "What does DNA do?",
+        "answer": "DNA carries genetic information for the development of organisms.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "What is Photosynthesis?",
+        "answer": "Photosynthesis turns light energy into chemical energy.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "What is DNA?",
+        "answer": "DNA is a type of plastic used in bottle manufacturing.",
+        "expected_risk": "red"
+    },
+    {
+        "question": "Where is Mount Everest?",
+        "answer": "Mount Everest is located in the Himalayas.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "Which is the largest river?",
+        "answer": "The Amazon River is the largest river by discharge volume.",
+        "expected_risk": "green"
+    },
+    {
+        "question": "Where is the Amazon River?",
+        "answer": "The Amazon River flows through the Sahara Desert in Africa.",
+        "expected_risk": "red"
+    }
+]

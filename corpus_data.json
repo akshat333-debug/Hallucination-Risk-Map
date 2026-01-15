@@ -1,0 +1,52 @@
+[
+    {
+        "id": "doc1",
+        "text": "Apollo 11 was the spaceflight that first landed humans on the Moon.",
+        "source": "Wiki-Space"
+    },
+    {
+        "id": "doc2",
+        "text": "Neil Armstrong and Buzz Aldrin formed the American crew that landed the Apollo Lunar Module Eagle on July 20, 1969.",
+        "source": "Wiki-Space"
+    },
+    {
+        "id": "doc3",
+        "text": "Machine learning is a field of inquiry devoted to understanding and building methods that 'learn'.",
+        "source": "Wiki-ML"
+    },
+    {
+        "id": "doc4",
+        "text": "Python is a high-level, general-purpose programming language.",
+        "source": "Wiki-Code"
+    },
+    {
+        "id": "hist1",
+        "text": "World War II was a global conflict that lasted from 1939 to 1945. It involved the vast majority of the world's countries fighting as part of two opposing military alliances: the Allies and the Axis.",
+        "source": "Wiki-History"
+    },
+    {
+        "id": "hist2",
+        "text": "The Roman Empire was the post-Republican period of ancient Rome. It included territorial holdings around the Mediterranean Sea in Europe, North Africa, and Western Asia.",
+        "source": "Wiki-History"
+    },
+    {
+        "id": "bio1",
+        "text": "DNA, or deoxyribonucleic acid, is the molecule that carries genetic information for the development and functioning of an organism.",
+        "source": "Wiki-Biology"
+    },
+    {
+        "id": "bio2",
+        "text": "Photosynthesis is a process used by plants and other organisms to convert light energy into chemical energy that, through cellular respiration, can later be released to fuel the organism's activities.",
+        "source": "Wiki-Biology"
+    },
+    {
+        "id": "geo1",
+        "text": "Mount Everest is Earth's highest mountain above sea level, located in the Mahalangur Himal sub-range of the Himalayas.",
+        "source": "Wiki-Geography"
+    },
+    {
+        "id": "geo2",
+        "text": "The Amazon River in South America is the largest river by discharge volume of water in the world, and by some definitions it is the longest.",
+        "source": "Wiki-Geography"
+    }
+]

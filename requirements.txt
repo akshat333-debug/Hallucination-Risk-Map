@@ -1,0 +1,14 @@
+streamlit
+sentence-transformers
+faiss-cpu
+spacy
+torch
+numpy
+pandas
+pypdf
+google-generativeai
+rank_bm25
+transformers
+sentencepiece
+accelerate
+streamlit-option-menu

@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.streamlit/secrets.toml
+vector_index.faiss
+bm25_index.pkl
+corpus_metadata.pkl
+*.log
+temp_*
