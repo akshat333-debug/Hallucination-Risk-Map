@@ -1,0 +1,118 @@
+Loading evaluation set...
+Initializing Pipeline...
+Initializing Strong Local Pipeline...
+⚖️ Loading Heavy Local Model: cross-encoder/nli-deberta-v3-base on cpu...
+✅ Heavy Local Model Ready.
+
+Starting Evaluation...
+
+Question                       | Expected   | Predicted  | Result
+----------------------------------------------------------------------
+When did Apollo 11 land?       | green      | green      | ✅
+Who walked on the moon first?  | green      | green      | ✅
+When did Perseverance land?    | green      | green      | ✅
+Did Mark Watney go to Mars?    | green      | green      | ✅
+Who walked on the moon first?  | red        | red        | ✅
+What weapon do Jedi use?       | red        | red        | ✅
+When did Apollo 11 land?       | red        | red        | ✅
+When did Rome fall?            | green      | green      | ✅
+Who was Cleopatra?             | green      | green      | ✅
+Did Caesar rule Rome in 2020?  | red        | red        | ✅
+How does Python define blocks? | green      | green      | ✅
+How does Java define blocks?   | green      | green      | ✅
+How does Python define blocks? | red        | green      | ❌
+   [DEBUG] Answer: Python uses curly braces like Java.
+   [CLAIM] Python uses curly braces like Java. -> green
+      [EVIDENCE] (0.67) Java uses curly braces {} to define code blocks....
+      [NLI] {'p_contradiction': 0.0038526321295648813, 'p_entailment': 0.00024219599436037242, 'p_neutral': 0.9959051609039307, 'label': 'neutral', 'claim_text': 'Python uses curly braces like Java.'}
+      [EVIDENCE] (0.69) Python uses indentation to define code blocks....
+      [NLI] {'p_contradiction': 0.9991698265075684, 'p_entailment': 5.5835418606875464e-05, 'p_neutral': 0.0007743590394966304, 'label': 'contradiction', 'claim_text': 'Python uses curly braces like Java.'}
+      [EVIDENCE] (0.15) banana is a fruit. yellow. curved....
+      [NLI] {'p_contradiction': 0.999686598777771, 'p_entailment': 6.552903505507857e-05, 'p_neutral': 0.00024788014707155526, 'label': 'contradiction', 'claim_text': 'Python uses curly braces like Java.'}
+What is JavaScript?            | red        | red        | ✅
+Where is Project_Alpha_1?      | green      | green      | ✅
+Where is Project_Alpha_1?      | red        | red        | ✅
+Where is Project_Alpha_2?      | green      | green      | ✅
+Where is Project_Alpha_2?      | red        | red        | ✅
+Where is Project_Alpha_3?      | green      | green      | ✅
+Where is Project_Alpha_3?      | red        | red        | ✅
+Where is Project_Alpha_4?      | green      | green      | ✅
+Where is Project_Alpha_4?      | red        | red        | ✅
+Where is Project_Alpha_5?      | green      | green      | ✅
+Where is Project_Alpha_5?      | red        | red        | ✅
+Where is Project_Alpha_6?      | green      | green      | ✅
+Where is Project_Alpha_6?      | red        | red        | ✅
+Where is Project_Alpha_7?      | green      | green      | ✅
+Where is Project_Alpha_7?      | red        | red        | ✅
+Where is Project_Alpha_8?      | green      | green      | ✅
+Where is Project_Alpha_8?      | red        | red        | ✅
+Where is Project_Alpha_9?      | green      | green      | ✅
+Where is Project_Alpha_9?      | red        | red        | ✅
+Where is Project_Alpha_10?     | green      | green      | ✅
+Where is Project_Alpha_10?     | red        | red        | ✅
+Where is Project_Alpha_11?     | green      | green      | ✅
+Where is Project_Alpha_11?     | red        | red        | ✅
+Where is Project_Alpha_12?     | green      | green      | ✅
+Where is Project_Alpha_12?     | red        | red        | ✅
+Where is Project_Alpha_13?     | green      | green      | ✅
+Where is Project_Alpha_13?     | red        | red        | ✅
+Where is Project_Alpha_14?     | green      | green      | ✅
+Where is Project_Alpha_14?     | red        | red        | ✅
+Where is Project_Alpha_15?     | green      | green      | ✅
+Where is Project_Alpha_15?     | red        | red        | ✅
+Where is Project_Alpha_16?     | green      | green      | ✅
+Where is Project_Alpha_16?     | red        | red        | ✅
+Where is Project_Alpha_17?     | green      | green      | ✅
+Where is Project_Alpha_17?     | red        | red        | ✅
+Where is Project_Alpha_18?     | green      | green      | ✅
+Where is Project_Alpha_18?     | red        | red        | ✅
+Where is Project_Alpha_19?     | green      | green      | ✅
+Where is Project_Alpha_19?     | red        | red        | ✅
+Where is Project_Alpha_20?     | green      | green      | ✅
+Where is Project_Alpha_20?     | red        | red        | ✅
+Where is Project_Alpha_21?     | green      | green      | ✅
+Where is Project_Alpha_21?     | red        | red        | ✅
+Where is Project_Alpha_22?     | green      | green      | ✅
+Where is Project_Alpha_22?     | red        | red        | ✅
+Where is Project_Alpha_23?     | green      | green      | ✅
+Where is Project_Alpha_23?     | red        | red        | ✅
+Where is Project_Alpha_24?     | green      | green      | ✅
+Where is Project_Alpha_24?     | red        | red        | ✅
+Where is Project_Alpha_25?     | green      | green      | ✅
+Where is Project_Alpha_25?     | red        | red        | ✅
+Where is Project_Alpha_26?     | green      | green      | ✅
+Where is Project_Alpha_26?     | red        | red        | ✅
+Where is Project_Alpha_27?     | green      | green      | ✅
+Where is Project_Alpha_27?     | red        | red        | ✅
+Where is Project_Alpha_28?     | green      | green      | ✅
+Where is Project_Alpha_28?     | red        | red        | ✅
+Where is Project_Alpha_29?     | green      | green      | ✅
+Where is Project_Alpha_29?     | red        | red        | ✅
+Where is Project_Alpha_30?     | green      | green      | ✅
+Where is Project_Alpha_30?     | red        | red        | ✅
+Where is Project_Alpha_31?     | green      | green      | ✅
+Where is Project_Alpha_31?     | red        | red        | ✅
+Where is Project_Alpha_32?     | green      | green      | ✅
+Where is Project_Alpha_32?     | red        | red        | ✅
+Where is Project_Alpha_33?     | green      | green      | ✅
+Where is Project_Alpha_33?     | red        | red        | ✅
+Where is Project_Alpha_34?     | green      | green      | ✅
+Where is Project_Alpha_34?     | red        | red        | ✅
+Where is Project_Alpha_35?     | green      | green      | ✅
+Where is Project_Alpha_35?     | red        | red        | ✅
+Where is Project_Alpha_36?     | green      | green      | ✅
+Where is Project_Alpha_36?     | red        | red        | ✅
+Where is Project_Alpha_37?     | green      | green      | ✅
+Where is Project_Alpha_37?     | red        | red        | ✅
+Where is Project_Alpha_38?     | green      | green      | ✅
+Where is Project_Alpha_38?     | red        | red        | ✅
+Where is Project_Alpha_39?     | green      | green      | ✅
+Where is Project_Alpha_39?     | red        | red        | ✅
+Where is the Eiffel Tower?     | green      | green      | ✅
+Is a banana a fruit?           | green      | green      | ✅
+Where is the Eiffel Tower?     | red        | red        | ✅
+----------------------------------------------------------------------
+
+Total Samples: 95
+Correct Predictions: 94
+Accuracy: 98.95%

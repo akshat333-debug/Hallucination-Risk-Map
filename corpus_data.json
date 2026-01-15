@@ -1,52 +1,262 @@
 [
-    {
-        "id": "doc1",
-        "text": "Apollo 11 was the spaceflight that first landed humans on the Moon.",
-        "source": "Wiki-Space"
-    },
-    {
-        "id": "doc2",
-        "text": "Neil Armstrong and Buzz Aldrin formed the American crew that landed the Apollo Lunar Module Eagle on July 20, 1969.",
-        "source": "Wiki-Space"
-    },
-    {
-        "id": "doc3",
-        "text": "Machine learning is a field of inquiry devoted to understanding and building methods that 'learn'.",
-        "source": "Wiki-ML"
-    },
-    {
-        "id": "doc4",
-        "text": "Python is a high-level, general-purpose programming language.",
-        "source": "Wiki-Code"
-    },
-    {
-        "id": "hist1",
-        "text": "World War II was a global conflict that lasted from 1939 to 1945. It involved the vast majority of the world's countries fighting as part of two opposing military alliances: the Allies and the Axis.",
-        "source": "Wiki-History"
-    },
-    {
-        "id": "hist2",
-        "text": "The Roman Empire was the post-Republican period of ancient Rome. It included territorial holdings around the Mediterranean Sea in Europe, North Africa, and Western Asia.",
-        "source": "Wiki-History"
-    },
-    {
-        "id": "bio1",
-        "text": "DNA, or deoxyribonucleic acid, is the molecule that carries genetic information for the development and functioning of an organism.",
-        "source": "Wiki-Biology"
-    },
-    {
-        "id": "bio2",
-        "text": "Photosynthesis is a process used by plants and other organisms to convert light energy into chemical energy that, through cellular respiration, can later be released to fuel the organism's activities.",
-        "source": "Wiki-Biology"
-    },
-    {
-        "id": "geo1",
-        "text": "Mount Everest is Earth's highest mountain above sea level, located in the Mahalangur Himal sub-range of the Himalayas.",
-        "source": "Wiki-Geography"
-    },
-    {
-        "id": "geo2",
-        "text": "The Amazon River in South America is the largest river by discharge volume of water in the world, and by some definitions it is the longest.",
-        "source": "Wiki-Geography"
-    }
+  {
+    "id": "space1",
+    "text": "Apollo 11 landed on the Moon on July 20, 1969.",
+    "source": "History-Space"
+  },
+  {
+    "id": "space2",
+    "text": "Neil Armstrong was the first human to walk on the lunar surface.",
+    "source": "History-Space"
+  },
+  {
+    "id": "space3",
+    "text": "The Mars Rover 'Perseverance' landed on Mars in February 2021.",
+    "source": "NASA-News"
+  },
+  {
+    "id": "fic_space1",
+    "text": "In the movie 'The Martian', Mark Watney gets stranded on Mars.",
+    "source": "Movie-Db"
+  },
+  {
+    "id": "fic_space2",
+    "text": "Jedi Knights use lightsabers weapon fueled by kyber crystals.",
+    "source": "StarWars-Lore"
+  },
+  {
+    "id": "hist1a",
+    "text": "The Roman Empire fell in 476 AD due to various factors.",
+    "source": "History-Brief"
+  },
+  {
+    "id": "hist1b",
+    "text": "The Fall of Rome is generally marked as 476 AD.",
+    "source": "History-Detailed"
+  },
+  {
+    "id": "hist2",
+    "text": "Cleopatra was the last active ruler of the Ptolemaic Kingdom of Egypt.",
+    "source": "Bio-Queen"
+  },
+  {
+    "id": "code1",
+    "text": "Python uses indentation to define code blocks.",
+    "source": "Py-Docs"
+  },
+  {
+    "id": "code2",
+    "text": "Java uses curly braces {} to define code blocks.",
+    "source": "Java-Docs"
+  },
+  {
+    "id": "code3",
+    "text": "JavaScript is a scripting language for the web.",
+    "source": "MDN"
+  },
+  {
+    "id": "gen_1",
+    "text": "Project_Alpha_1 is located in Sector_1 and initiated protocol 1.",
+    "source": "Log-1"
+  },
+  {
+    "id": "gen_2",
+    "text": "Project_Alpha_2 is located in Sector_2 and initiated protocol 2.",
+    "source": "Log-2"
+  },
+  {
+    "id": "gen_3",
+    "text": "Project_Alpha_3 is located in Sector_3 and initiated protocol 3.",
+    "source": "Log-3"
+  },
+  {
+    "id": "gen_4",
+    "text": "Project_Alpha_4 is located in Sector_4 and initiated protocol 4.",
+    "source": "Log-4"
+  },
+  {
+    "id": "gen_5",
+    "text": "Project_Alpha_5 is located in Sector_5 and initiated protocol 5.",
+    "source": "Log-5"
+  },
+  {
+    "id": "gen_6",
+    "text": "Project_Alpha_6 is located in Sector_6 and initiated protocol 6.",
+    "source": "Log-6"
+  },
+  {
+    "id": "gen_7",
+    "text": "Project_Alpha_7 is located in Sector_7 and initiated protocol 7.",
+    "source": "Log-7"
+  },
+  {
+    "id": "gen_8",
+    "text": "Project_Alpha_8 is located in Sector_8 and initiated protocol 8.",
+    "source": "Log-8"
+  },
+  {
+    "id": "gen_9",
+    "text": "Project_Alpha_9 is located in Sector_9 and initiated protocol 9.",
+    "source": "Log-9"
+  },
+  {
+    "id": "gen_10",
+    "text": "Project_Alpha_10 is located in Sector_10 and initiated protocol 10.",
+    "source": "Log-10"
+  },
+  {
+    "id": "gen_11",
+    "text": "Project_Alpha_11 is located in Sector_11 and initiated protocol 11.",
+    "source": "Log-11"
+  },
+  {
+    "id": "gen_12",
+    "text": "Project_Alpha_12 is located in Sector_12 and initiated protocol 12.",
+    "source": "Log-12"
+  },
+  {
+    "id": "gen_13",
+    "text": "Project_Alpha_13 is located in Sector_13 and initiated protocol 13.",
+    "source": "Log-13"
+  },
+  {
+    "id": "gen_14",
+    "text": "Project_Alpha_14 is located in Sector_14 and initiated protocol 14.",
+    "source": "Log-14"
+  },
+  {
+    "id": "gen_15",
+    "text": "Project_Alpha_15 is located in Sector_15 and initiated protocol 15.",
+    "source": "Log-15"
+  },
+  {
+    "id": "gen_16",
+    "text": "Project_Alpha_16 is located in Sector_16 and initiated protocol 16.",
+    "source": "Log-16"
+  },
+  {
+    "id": "gen_17",
+    "text": "Project_Alpha_17 is located in Sector_17 and initiated protocol 17.",
+    "source": "Log-17"
+  },
+  {
+    "id": "gen_18",
+    "text": "Project_Alpha_18 is located in Sector_18 and initiated protocol 18.",
+    "source": "Log-18"
+  },
+  {
+    "id": "gen_19",
+    "text": "Project_Alpha_19 is located in Sector_19 and initiated protocol 19.",
+    "source": "Log-19"
+  },
+  {
+    "id": "gen_20",
+    "text": "Project_Alpha_20 is located in Sector_20 and initiated protocol 20.",
+    "source": "Log-20"
+  },
+  {
+    "id": "gen_21",
+    "text": "Project_Alpha_21 is located in Sector_21 and initiated protocol 21.",
+    "source": "Log-21"
+  },
+  {
+    "id": "gen_22",
+    "text": "Project_Alpha_22 is located in Sector_22 and initiated protocol 22.",
+    "source": "Log-22"
+  },
+  {
+    "id": "gen_23",
+    "text": "Project_Alpha_23 is located in Sector_23 and initiated protocol 23.",
+    "source": "Log-23"
+  },
+  {
+    "id": "gen_24",
+    "text": "Project_Alpha_24 is located in Sector_24 and initiated protocol 24.",
+    "source": "Log-24"
+  },
+  {
+    "id": "gen_25",
+    "text": "Project_Alpha_25 is located in Sector_25 and initiated protocol 25.",
+    "source": "Log-25"
+  },
+  {
+    "id": "gen_26",
+    "text": "Project_Alpha_26 is located in Sector_26 and initiated protocol 26.",
+    "source": "Log-26"
+  },
+  {
+    "id": "gen_27",
+    "text": "Project_Alpha_27 is located in Sector_27 and initiated protocol 27.",
+    "source": "Log-27"
+  },
+  {
+    "id": "gen_28",
+    "text": "Project_Alpha_28 is located in Sector_28 and initiated protocol 28.",
+    "source": "Log-28"
+  },
+  {
+    "id": "gen_29",
+    "text": "Project_Alpha_29 is located in Sector_29 and initiated protocol 29.",
+    "source": "Log-29"
+  },
+  {
+    "id": "gen_30",
+    "text": "Project_Alpha_30 is located in Sector_30 and initiated protocol 30.",
+    "source": "Log-30"
+  },
+  {
+    "id": "gen_31",
+    "text": "Project_Alpha_31 is located in Sector_31 and initiated protocol 31.",
+    "source": "Log-31"
+  },
+  {
+    "id": "gen_32",
+    "text": "Project_Alpha_32 is located in Sector_32 and initiated protocol 32.",
+    "source": "Log-32"
+  },
+  {
+    "id": "gen_33",
+    "text": "Project_Alpha_33 is located in Sector_33 and initiated protocol 33.",
+    "source": "Log-33"
+  },
+  {
+    "id": "gen_34",
+    "text": "Project_Alpha_34 is located in Sector_34 and initiated protocol 34.",
+    "source": "Log-34"
+  },
+  {
+    "id": "gen_35",
+    "text": "Project_Alpha_35 is located in Sector_35 and initiated protocol 35.",
+    "source": "Log-35"
+  },
+  {
+    "id": "gen_36",
+    "text": "Project_Alpha_36 is located in Sector_36 and initiated protocol 36.",
+    "source": "Log-36"
+  },
+  {
+    "id": "gen_37",
+    "text": "Project_Alpha_37 is located in Sector_37 and initiated protocol 37.",
+    "source": "Log-37"
+  },
+  {
+    "id": "gen_38",
+    "text": "Project_Alpha_38 is located in Sector_38 and initiated protocol 38.",
+    "source": "Log-38"
+  },
+  {
+    "id": "gen_39",
+    "text": "Project_Alpha_39 is located in Sector_39 and initiated protocol 39.",
+    "source": "Log-39"
+  },
+  {
+    "id": "messy1",
+    "text": "thE  Eiffel   Tower is in   Paris, France!!!",
+    "source": "Travel-Blog"
+  },
+  {
+    "id": "messy2",
+    "text": "banana is a fruit. yellow. curved.",
+    "source": "Toddler-Book"
+  }
 ]
