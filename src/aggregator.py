@@ -29,34 +29,39 @@ def aggregate_scores(retrieval_results, nli_results):
         # --- ROBUST LOGIC ---
         
         # 1. The "Perfect Match"
-        # High Entailment + Good Similarity
-        if entail_score > 0.8:
+        # High Entailment (regardless of similarity, because vectors can fail on jargon)
+        if entail_score > 0.6:
             trust_score = 0.95
         
-        # 2. The "Keyword Rescue"
-        # NLI is confused (Neutral), but words match perfectly (Dates/Names)
-        elif neutral_score > 0.6 and overlap > 0.6:
-            trust_score = 0.85 # Trust the keywords
+        # 2. The "Keyword Rescue" / "Direct Quote"
+        # If words match almost perfectly, trust it even if vectors/NLI rely on context
+        elif overlap > 0.7:
+             trust_score = 0.90
+
+        # 3. The "Mixed Signals"
+        # Neutral NLI but decent keyword overlap
+        elif neutral_score > 0.4 and overlap > 0.5:
+            trust_score = 0.80 
             
-        # 3. The "Semantic Match"
-        # NLI says Neutral, but Similarity is extremely high (Paraphrased perfectly)
-        elif neutral_score > 0.5 and sim_score > 0.7:
+        # 4. The "Semantic Match"
+        # NLI says Neutral, but Similarity is strong (0.6 is quite high for sentences)
+        elif neutral_score > 0.4 and sim_score > 0.6:
             trust_score = 0.75
             
-        # 4. The "Hard Contradiction"
+        # 5. The "Hard Contradiction"
         elif contra_score > 0.5:
             trust_score = 0.1
             
-        # 5. The "Vague/Weak"
+        # 6. Fallback
         else:
-            trust_score = 0.4
-            
+            trust_score = 0.35
+
         # Keep best
         if trust_score > best_score:
             best_score = trust_score
             
             # Labeling
-            if trust_score > 0.8:
+            if trust_score >= 0.8:
                 label = "Verified"
                 color = "green"
             elif trust_score > 0.6:

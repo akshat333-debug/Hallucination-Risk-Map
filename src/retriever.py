@@ -1,7 +1,7 @@
 import faiss
 import pickle
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 import os
 import re
 
@@ -19,59 +19,76 @@ class LocalRetriever:
         with open("bm25_index.pkl", 'rb') as f:
             self.bm25 = pickle.load(f)
             
-        # Use the stronger model matching index_builder
+        # Bi-Encoder for Initial Retrieval (Fast)
         self.model = SentenceTransformer('all-mpnet-base-v2') 
+        
+        # Cross-Encoder for Re-Ranking (Accurate)
+        # MS MARCO MiniLM is fast and trained for relevance ranking
+        self.reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
 
     def simple_tokenize(self, text):
         return re.findall(r'\b\w+\b', text.lower())
 
-    def retrieve(self, query: str, k: int = 3):
-        # 1. Vector Search (Semantic)
+    def retrieve(self, query: str, k: int = 5):
+        # --- STAGE 1: BROAD SEARCH (Retrieve 50 candidates) ---
+        initial_k = 50 
+        
+        # 1. Vector Search
         query_vec = self.model.encode([query], convert_to_numpy=True)
         faiss.normalize_L2(query_vec)
-        v_scores, v_indices = self.index.search(query_vec, k * 2) # Get more candidates
+        v_scores, v_indices = self.index.search(query_vec, initial_k)
         
-        # 2. BM25 Search (Keyword)
+        # 2. BM25 Search
         tokenized_query = self.simple_tokenize(query)
-        # Get top N BM25 scores
         bm25_scores = self.bm25.get_scores(tokenized_query)
-        # Get indices of top k*2
-        bm25_indices = np.argsort(bm25_scores)[::-1][:k*2]
+        bm25_indices = np.argsort(bm25_scores)[::-1][:initial_k]
         
-        # 3. Hybrid Fusion (Reciprocal Rank Fusion - RRF)
-        # We combine the two lists. If a doc appears in both, it shoots to the top.
+        # 3. Hybrid Fusion (RRF)
         combined_scores = {}
         
-        # Helper to add scores
         def add_rank(indices, weight=1.0):
             for rank, idx in enumerate(indices):
                 if idx == -1: continue
                 if idx not in combined_scores: combined_scores[idx] = 0.0
-                # RRF Formula: 1 / (k + rank)
                 combined_scores[idx] += (1.0 / (60 + rank)) * weight
 
-        add_rank(v_indices[0], weight=1.0) # Vector weight
-        add_rank(bm25_indices, weight=1.5) # Boost Keyword weight slightly (trust exact matches more)
+        add_rank(v_indices[0], weight=1.0)
+        add_rank(bm25_indices, weight=1.5)
         
-        # Sort by combined score
-        sorted_indices = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:k]
+        # Get top 50 candidates from Hybrid Fusion
+        broad_candidates = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:initial_k]
+        
+        # --- STAGE 2: RE-RANKING (Cross-Encoder) ---
+        if not broad_candidates: return []
+        
+        # Prepare pairs for Cross-Encoder: [ [Query, Doc1], [Query, Doc2], ... ]
+        pairs = []
+        candidate_indices = []
+        
+        for idx, _ in broad_candidates:
+            doc_text = self.metadata[idx]["text"]
+            pairs.append([query, doc_text])
+            candidate_indices.append(idx)
+            
+        # Predict scores (Logits)
+        ce_scores = self.reranker.predict(pairs)
+        
+        # Sort by Cross-Encoder score
+        # Zip indices with their new CE scores
+        reranked = sorted(zip(candidate_indices, ce_scores), key=lambda x: x[1], reverse=True)[:k]
         
         results = []
-        for idx, score in sorted_indices:
+        for idx, score in reranked:
             doc = self.metadata[idx]
-            # We calculate a 'pseudo-similarity' for display purposes based on vector score
-            # (Just finding the original vector score for UI consistency)
-            orig_sim = 0.0
-            if idx in v_indices[0]:
-                pos = np.where(v_indices[0] == idx)[0][0]
-                orig_sim = float(v_scores[0][pos])
-            else:
-                orig_sim = 0.5 # Default for BM25-only matches
-                
+            
+            # Normalize logit to 0-1 for UI consistency (Sigmoid)
+            # This allows the Aggregator to still work with "sim_score > 0.6" logic
+            normalized_score = 1 / (1 + np.exp(-score))
+            
             results.append({
                 "text": doc["text"],
                 "source": doc.get("source", "Unknown"),
-                "similarity": orig_sim
+                "similarity": float(normalized_score) # High quality relevance score
             })
             
         return results
