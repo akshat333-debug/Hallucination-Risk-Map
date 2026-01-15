@@ -12,7 +12,7 @@ class RiskAnalysisPipeline:
         self.verifier = NLIVerifier() 
         print("✅ Heavy Local Model Ready.")
 
-    def process(self, question: str, answer: str, api_key: str = None):
+    def process(self, question: str, answer: str, api_key: str = None, thresholds: dict = None):
         # 1. Extract Claims (We still use LLM splitter if available, else Spacy)
         claims = extract_claims(answer, api_key=api_key)
         
@@ -32,7 +32,7 @@ class RiskAnalysisPipeline:
                 score['claim_text'] = claim.text
 
             # 4. Math Aggregation (Logic + Entities + Vectors)
-            agg = aggregate_scores(evidences, nli_scores)
+            agg = aggregate_scores(evidences, nli_scores, thresholds=thresholds)
             
             # Build Result Object
             result_obj = {

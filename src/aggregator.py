@@ -10,7 +10,13 @@ def calculate_overlap(claim_text, evidence_text):
     if not c_words: return 0.0
     return len(c_words.intersection(e_words)) / len(c_words)
 
-def aggregate_scores(retrieval_results, nli_results):
+def aggregate_scores(retrieval_results, nli_results, thresholds=None):
+    if not thresholds:
+        thresholds = {"sim_threshold": 0.6, "entail_threshold": 0.6}
+        
+    sim_thresh = thresholds.get("sim_threshold", 0.6)
+    entail_thresh = thresholds.get("entail_threshold", 0.6)
+
     if not retrieval_results:
         return {"risk_label": "No Evidence", "score": 0.0, "color": "red"}
 
@@ -26,11 +32,11 @@ def aggregate_scores(retrieval_results, nli_results):
         
         overlap = calculate_overlap(nli.get('claim_text', ''), res['text'])
         
-        # --- ROBUST LOGIC ---
+        # --- ROBUST LOGIC (Configurable) ---
         
         # 1. The "Perfect Match"
-        # High Entailment (regardless of similarity, because vectors can fail on jargon)
-        if entail_score > 0.6:
+        # High Entailment (User Configured)
+        if entail_score > entail_thresh:
             trust_score = 0.95
         
         # 2. The "Keyword Rescue" / "Direct Quote"
@@ -44,8 +50,8 @@ def aggregate_scores(retrieval_results, nli_results):
             trust_score = 0.80 
             
         # 4. The "Semantic Match"
-        # NLI says Neutral, but Similarity is strong (0.6 is quite high for sentences)
-        elif neutral_score > 0.4 and sim_score > 0.6:
+        # NLI says Neutral, but Similarity is strong (User Configured)
+        elif neutral_score > 0.4 and sim_score > sim_thresh:
             trust_score = 0.75
             
         # 5. The "Hard Contradiction"

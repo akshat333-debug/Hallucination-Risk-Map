@@ -37,7 +37,7 @@ st.markdown("""
 from src.visualizer import plot_radar_chart, plot_sunburst, create_interactive_network
 
 @st.cache_resource
-def get_pipeline():
+def get_pipeline_v2():
     if not os.path.exists("vector_index.faiss"): return None
     from src.pipeline import RiskAnalysisPipeline
     return RiskAnalysisPipeline()
@@ -46,24 +46,71 @@ def get_pipeline():
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=60)
     st.markdown("### **Risk Map AI**")
-    st.caption("Status: 🟢 Offline Mode (Local)")
+
     
     selected_page = option_menu(
-        "Menu", ["Dashboard", "Knowledge Base", "Settings"], 
-        icons=['speedometer2', 'database', 'gear'], menu_icon="cast", default_index=0,
+        "Menu", ["Dashboard", "Knowledge Base"], 
+        icons=['speedometer2', 'database'], menu_icon="cast", default_index=0,
         styles={"container": {"background-color": "transparent"}, "nav-link-selected": {"background-color": "#636EFA"}}
     )
+    
+
+    with st.expander("⚙️ Advanced Settings"):
+        st.caption("Adjust Verification Sensitivity")
+        
+        sim_val = st.slider(
+            "Similarity Match", 
+            min_value=0.4, max_value=0.9, value=0.6, step=0.05,
+            help="Higher = Requires exact wording. Lower = Allows paraphrasing."
+        )
+        
+        entail_val = st.slider(
+            "Logic Match", 
+            min_value=0.4, max_value=0.9, value=0.6, step=0.05,
+            help="Higher = Requires strict logical proof. Lower = Allows 'likely' connections."
+        )
+        
+        st.info(
+            """
+            **Recommended Values:**
+            *   📄 **PDF / Summaries:** Sim 0.60 | Logic 0.60
+            *   🧠 **General Facts:** Sim 0.75 | Logic 0.75
+            *   🔬 **Critical Data:** Sim 0.85 | Logic 0.85
+            
+            *(Usually keep both values similar)*
+            """
+        )
+        
+    thresholds = {
+        "sim_threshold": sim_val,
+        "entail_threshold": entail_val
+    }
 
 # --- PAGE ROUTING ---
 
-if selected_page == "Settings":
-    st.header("⚙️ Configuration")
-    st.info("System is running in pure Offline Mode. No API keys required.")
-    st.text("Embeddings: all-mpnet-base-v2")
-    st.text("Verifier: cross-encoder/nli-deberta-v3-base")
-
-elif selected_page == "Knowledge Base":
+if selected_page == "Knowledge Base":
     st.header("📚 Knowledge Base")
+    
+    # --- Display Current Index Content ---
+    from src.index_builder import get_indexed_files, process_uploaded_file
+    
+    files = get_indexed_files()
+    if files:
+        st.subheader("✅ Currently Indexed Files")
+        for f in files:
+            st.markdown(f"- 📄 **{f}**")
+        st.divider()
+    else:
+        st.warning("⚠️ Knowledge Base is Empty. Upload documents below.")
+
+    if files and st.button("🗑️ Clear Knowledge Base"):
+        import shutil
+        if os.path.exists("vector_index.faiss"): os.remove("vector_index.faiss")
+        if os.path.exists("corpus_metadata.pkl"): os.remove("corpus_metadata.pkl")
+        if os.path.exists("bm25_index.pkl"): os.remove("bm25_index.pkl")
+        st.success("Index cleared!")
+        st.rerun()
+
     uploaded_file = st.file_uploader("Upload Ground Truth (PDF/TXT)", type=["pdf", "txt"])
     if uploaded_file and st.button("⚡ Build Index", type="primary"):
         with st.spinner("Building Hybrid Index..."):
@@ -74,64 +121,29 @@ elif selected_page == "Knowledge Base":
 
 elif selected_page == "Dashboard":
     st.markdown("<h1 style='text-align: center;'>🧠 Hallucination Risk Map</h1>", unsafe_allow_html=True)
-
-    # --- TABS FOR MODE SELECTION ---
-    mode_tab1, mode_tab2 = st.tabs(["🔎 Search & Verify", "📋 Audit External Text"])
-
-    # === MODE 1: SEARCH & VERIFY (Extractive RAG) ===
-    with mode_tab1:
-        if "generated_answer" not in st.session_state: st.session_state["generated_answer"] = ""
-        
-        question = st.text_input("", "What is the capital of France?", placeholder="Ask your document...", key="q_input")
-        
-        if st.button("🚀 Run Search", use_container_width=True, key="run_btn"):
-            pipeline = get_pipeline()
-            if pipeline:
-                with st.spinner("🔍 Searching Local Knowledge Base..."):
-                    # 1. Retrieve
-                    ctx = pipeline.retriever.retrieve(question, k=3)
-                    
-                    if ctx:
-                        # 2. Extractive "Generation" (Take top result)
-                        # We use the top result as the "Answer" to verify and display
-                        top_answer = ctx[0]['text']
-                        if len(ctx) > 1: top_answer += " " + ctx[1]['text']
-                        
-                        st.session_state["generated_answer"] = top_answer
-                        
-                        # 3. Verify
-                        st.session_state['results'] = pipeline.process(question, st.session_state["generated_answer"])
-                    else:
-                        st.warning("No relevant information found in Knowledge Base.")
-                        st.session_state["generated_answer"] = ""
-            else:
-                st.error("Build Index first!")
-
-        if st.session_state["generated_answer"]:
-            st.markdown("### 📝 Retrieved Answer")
-            st.info(st.session_state["generated_answer"])
-
-    # === MODE 2: AUDIT EXTERNAL TEXT (Manual Paste) ===
-    with mode_tab2:
-        st.info("Paste text to verify it against your Knowledge Base.")
-        
-        col_q, col_txt = st.columns([1, 2])
-        with col_q:
-            audit_question = st.text_input("Context Question (Optional)", placeholder="What is this text about?", key="audit_q")
-        with col_txt:
-            audit_text = st.text_area("Paste Text to Verify", height=200, placeholder="Paste the AI response here...", key="audit_txt")
-        
-        if st.button("🕵️ Verify Pasted Text", type="primary", use_container_width=True):
-            pipeline = get_pipeline()
-            if pipeline and audit_text:
-                with st.spinner("🧠 Auditing external text..."):
-                    query_context = audit_question if audit_question else audit_text[:100]
-                    st.session_state['results'] = pipeline.process(query_context, audit_text)
-                    st.session_state["generated_answer"] = "" 
-            elif not pipeline:
-                st.error("Index not ready.")
-            elif not audit_text:
-                st.warning("Please paste some text first.")
+    st.markdown("<p style='text-align: center;'>Paste any text (Article, LLM Response, Summary) to verify its claims against your verified Knowledge Base.</p>", unsafe_allow_html=True)
+    
+    # --- MAIN INPUT AREA ---
+    col_q, col_txt = st.columns([1, 2])
+    with col_q:
+        st.info("💡 **Context Question (Optional)**\n\nHelps the AI understand what the text *should* be answering.")
+        audit_question = st.text_input("Enter Question:", placeholder="What is this text about?", key="audit_q", label_visibility="collapsed")
+    with col_txt:
+        audit_text = st.text_area("Paste Text to Verify", height=200, placeholder="Paste the text you want to audit here...", key="audit_txt")
+    
+    if st.button("🕵️ Verify Pasted Text", type="primary", use_container_width=True):
+        pipeline = get_pipeline_v2()
+        if not audit_text:
+            st.warning("Please paste some text first.")
+        elif not pipeline:
+            st.error("Index not ready. Go to 'Knowledge Base' to upload documents.")
+        else:
+            with st.spinner("🧠 Auditing external text..."):
+                query_context = audit_question if audit_question else audit_text[:100]
+                # Pass thresholds from sidebar
+                results = pipeline.process(question=query_context, answer=audit_text, thresholds=thresholds)
+                st.session_state['results'] = results
+                st.rerun()
 
     # --- SHARED RESULTS DASHBOARD ---
     if 'results' in st.session_state:

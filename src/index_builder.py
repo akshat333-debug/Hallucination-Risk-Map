@@ -43,9 +43,10 @@ def extract_text_from_pdf(pdf_path):
                 chunk = text[start:end]
                 # Only keep chunks with actual content
                 if len(chunk) > 50:
+                    filename = os.path.basename(pdf_path).replace("temp_", "")
                     text_chunks.append({
                         "text": chunk,
-                        "source": f"Page {i+1}"
+                        "source": f"{filename} (Page {i+1})"
                     })
     return text_chunks
 
@@ -95,8 +96,41 @@ def process_uploaded_file(uploaded_file):
                 text = f.read()
                 data = [{"text": t, "source": "Text"} for t in text.split('\n\n') if t]
 
-        build_index_from_documents(data)
-        return len(data)
+        # --- NEW LOGIC: APPEND TO INDEX ---
+        existing_docs = []
+        if os.path.exists(METADATA_FILE):
+             try:
+                 with open(METADATA_FILE, 'rb') as f:
+                     existing_docs = pickle.load(f)
+             except: pass
+        
+        # Check for duplicates (basic check by source filename)
+        # If we re-upload the same file, we should probably remove old chunks of that file first
+        # based on the source string starting with the filename.
+        new_filename = uploaded_file.name
+        
+        # Filter out old chunks of this file if present (Update logic)
+        existing_docs = [d for d in existing_docs if new_filename not in d['source']]
+        
+        # Combine
+        combined_docs = existing_docs + data
+        
+        build_index_from_documents(combined_docs)
+        return len(combined_docs)
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+def get_indexed_files():
+    if not os.path.exists(METADATA_FILE):
+        return []
+    
+    with open(METADATA_FILE, 'rb') as f:
+        docs = pickle.load(f)
+    
+    # Extract unique sources
+    sources = set()
+    for d in docs:
+        sources.add(d.get("source", "Unknown"))
+        
+    return sorted(list(sources))
