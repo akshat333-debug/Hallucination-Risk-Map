@@ -13,3 +13,6 @@ sentencepiece
 accelerate
 streamlit-option-menu
 huggingface_hub
+plotly
+networkx
+pyvis
