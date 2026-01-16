@@ -29,20 +29,34 @@ def plot_radar_chart(analysis):
         theta=categories,
         fill='toself',
         name='Claim Metrics',
-        line_color='#00CC96' if entail > contra else '#EF553B'
+        line_color='#00CC96' if entail > contra else '#EF553B',
+        mode='lines+markers+text',
+        text=[f"{v:.2f}" for v in values],
+        textposition="top center",
+        textfont=dict(color="white", size=12, family="Arial Black"),
+        marker=dict(size=8, color="white", line=dict(color="black", width=1))
     ))
 
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 1]
-            )),
+                range=[0, 1],
+                tickfont=dict(color="white", size=10),
+                gridcolor="rgba(255, 255, 255, 0.2)",
+                linecolor="rgba(255, 255, 255, 0.2)"
+            ),
+            angularaxis=dict(
+                tickfont=dict(color="white", size=12),
+                linecolor="rgba(255, 255, 255, 0.2)"
+            ),
+            bgcolor="rgba(0,0,0,0)"
+        ),
         showlegend=False,
         margin=dict(l=40, r=40, t=40, b=40),
-        paper_bgcolor="rgba(0,0,0,0)", # Transparent background
+        paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(size=14)
+        font=dict(size=14, color="white")
     )
     return fig
 

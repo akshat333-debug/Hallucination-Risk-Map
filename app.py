@@ -164,7 +164,18 @@ elif selected_page == "Dashboard":
                     <p>{c['claim_text']}</p>
                 </div>""", unsafe_allow_html=True)
                 with st.expander(f"Details for Claim {i+1}"):
-                    st.plotly_chart(plot_radar_chart(c['analysis']), use_container_width=True, key=f"radar_{i}")
+                    c_chart, c_stats = st.columns([2, 1])
+                    with c_chart:
+                        st.plotly_chart(plot_radar_chart(c['analysis']), use_container_width=True, key=f"radar_{i}")
+                    with c_stats:
+                        st.markdown("#### Verification Status")
+                        st.metric("Overall Score", f"{c['analysis']['score']:.2f}")
+                        st.metric("Verdict", c['analysis']['risk_label'], delta_color="normal")
+                        st.caption(f"Entailment: {c['analysis']['entailment_strength']:.2f}")
+                        st.caption(f"Contradiction: {c['analysis']['contradiction_strength']:.2f}")
+                    
+                    st.divider()
+                    st.markdown("#### Verified Evidence Sources")
                     for ev in c['evidence']:
                         st.caption(f"Source: {ev['source']} ({ev['similarity']:.2f})")
                         st.text(ev['text'])
