@@ -12,7 +12,7 @@ class RiskAnalysisPipeline:
         self.verifier = NLIVerifier() 
         print("✅ Heavy Local Model Ready.")
 
-    def process(self, question: str, answer: str, api_key: str = None, thresholds: dict = None):
+    def process(self, question: str, answer: str, api_key: str = None, thresholds: dict = None, model_selection="base"):
         # 1. Extract Claims (We still use LLM splitter if available, else Spacy)
         claims = extract_claims(answer, api_key=api_key)
         
@@ -25,7 +25,7 @@ class RiskAnalysisPipeline:
             evidences = self.retriever.retrieve(claim.text, k=5)
             
             # 3. Local Verification (DeBERTa)
-            nli_scores = self.verifier.verify(claim.text, evidences)
+            nli_scores = self.verifier.verify(claim.text, evidences, model_selection=model_selection)
             
             # Tag claim text for the Entity Auditor in aggregator
             for score in nli_scores:

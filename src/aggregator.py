@@ -15,7 +15,7 @@ def aggregate_scores(retrieval_results, nli_results, thresholds=None):
         thresholds = {"sim_threshold": 0.6, "entail_threshold": 0.6}
         
     sim_thresh = thresholds.get("sim_threshold", 0.6)
-    entail_thresh = thresholds.get("entail_threshold", 0.6)
+    entail_thresh = thresholds.get("entail_threshold", 0.7)
 
     if not retrieval_results:
         return {"risk_label": "No Evidence", "score": 0.0, "color": "red"}
@@ -30,19 +30,26 @@ def aggregate_scores(retrieval_results, nli_results, thresholds=None):
         contra_score = nli['p_contradiction']
         neutral_score = nli['p_neutral']
         
-        overlap = calculate_overlap(nli.get('claim_text', ''), res['text'])
+        claim_fn = nli.get('claim_text', '')
+        overlap = calculate_overlap(claim_fn, res['text'])
         
-        # --- ROBUST LOGIC (Configurable) ---
+        # --- ROBUST LOGIC v2 (Adaptive) ---
         
-        # 1. The "Perfect Match"
-        # High Entailment (User Configured)
-        if entail_score > entail_thresh:
+        # 1. The "Undeniable Truth" (Super High NLI)
+        # If the model is > 85% sure, we trust it even if wording is different (e.g. 1 year vs 12 months)
+        if entail_score > 0.85:
             trust_score = 0.95
-        
-        # 2. The "Keyword Rescue" / "Direct Quote"
-        # If words match almost perfectly, trust it even if vectors/NLI rely on context
-        elif overlap > 0.7:
+            
+        # 2. The "Corroborated Truth" (Moderate NLI + Keyword Overlap)
+        # If model is > 60% sure AND keywords match significantly (e.g. 50%), trust it.
+        # This filters out "Alloy" vs "Aluminum" (low overlap) if NLI is only 75%.
+        elif entail_score > 0.60 and overlap > 0.5:
              trust_score = 0.90
+             
+        # 3. The "Contradiction"
+        elif contra_score > 0.5:
+            trust_score = 0.1
+
 
         # 3. The "Mixed Signals"
         # Neutral NLI but decent keyword overlap

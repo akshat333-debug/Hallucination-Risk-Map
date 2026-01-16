@@ -37,7 +37,7 @@ st.markdown("""
 from src.visualizer import plot_radar_chart, plot_sunburst, create_interactive_network
 
 @st.cache_resource
-def get_pipeline_v2():
+def get_pipeline_v3():
     if not os.path.exists("vector_index.faiss"): return None
     from src.pipeline import RiskAnalysisPipeline
     return RiskAnalysisPipeline()
@@ -80,6 +80,16 @@ with st.sidebar:
             *(Usually keep both values similar)*
             """
         )
+        
+        st.divider()
+        st.caption("Verification Model")
+        model_ui = st.radio(
+            "Select AI Engine",
+            ["⚡ Quick (Base)", "✨ Hyper-Efficient (Auto)"],
+            help="Auto uses Base model + Symbolic Logic for math/units."
+        )
+        if "Quick" in model_ui: model_key = "base"
+        else: model_key = "auto"
         
     thresholds = {
         "sim_threshold": sim_val,
@@ -132,7 +142,7 @@ elif selected_page == "Dashboard":
         audit_text = st.text_area("Paste Text to Verify", height=200, placeholder="Paste the text you want to audit here...", key="audit_txt")
     
     if st.button("🕵️ Verify Pasted Text", type="primary", use_container_width=True):
-        pipeline = get_pipeline_v2()
+        pipeline = get_pipeline_v3()
         if not audit_text:
             st.warning("Please paste some text first.")
         elif not pipeline:
@@ -141,7 +151,7 @@ elif selected_page == "Dashboard":
             with st.spinner("🧠 Auditing external text..."):
                 query_context = audit_question if audit_question else audit_text[:100]
                 # Pass thresholds from sidebar
-                results = pipeline.process(question=query_context, answer=audit_text, thresholds=thresholds)
+                results = pipeline.process(question=query_context, answer=audit_text, thresholds=thresholds, model_selection=model_key)
                 st.session_state['results'] = results
                 st.rerun()
 

@@ -12,3 +12,4 @@ transformers
 sentencepiece
 accelerate
 streamlit-option-menu
+huggingface_hub
