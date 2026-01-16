@@ -170,3 +170,132 @@ def create_interactive_network(claims):
     except Exception as e:
         print(f"Graph error: {e}")
         return None
+
+# --- 4. TRUST TIMELINE (Line Chart) ---
+def plot_trust_timeline(claims):
+    """
+    Shows how factuality evolves as you read the text.
+    """
+    x = [f"Claim {i+1}" for i in range(len(claims))]
+    y = [c['analysis']['score'] for c in claims]
+    colors = [c['analysis']['color'] for c in claims]
+    
+    # Map colors to hex
+    color_map = {"green": "#00CC96", "orange": "#FFA15A", "red": "#EF553B"}
+    marker_colors = [color_map.get(c, "#d3d3d3") for c in colors]
+
+    fig = go.Figure()
+
+    # Line Trace
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='lines+markers',
+        line=dict(color='white', width=2, shape='spline'),
+        marker=dict(size=12, color=marker_colors, line=dict(color='white', width=2)),
+        name='Trust Score'
+    ))
+
+    # Add background zones
+    fig.add_hrect(y0=0.8, y1=1.0, fillcolor="green", opacity=0.1, layer="below", line_width=0)
+    fig.add_hrect(y0=0.4, y1=0.8, fillcolor="orange", opacity=0.1, layer="below", line_width=0)
+    fig.add_hrect(y0=0.0, y1=0.4, fillcolor="red", opacity=0.1, layer="below", line_width=0)
+
+    fig.update_layout(
+        title="Evaluated Trust Flow",
+        yaxis=dict(title="Trust Score", range=[0, 1.05], gridcolor='rgba(255,255,255,0.1)'),
+        xaxis=dict(gridcolor='rgba(255,255,255,0.1)'),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        margin=dict(l=20, r=20, t=40, b=20),
+        showlegend=False
+    )
+    return fig
+
+# --- 5. SOURCE ATTRIBUTION (Bar Chart) ---
+def plot_source_attribution(claims):
+    """
+    Which files are we relying on?
+    """
+    source_counts = {}
+    
+    for c in claims:
+        # Only count 'Supporting' evidence (similarity > 0.4 or entailed)
+        for ev in c['evidence']:
+            if ev['similarity'] > 0.4:
+                # Clean filename: "report.pdf (Page 1)" -> "report.pdf"
+                fname = ev['source'].split(" (Page")[0]
+                source_counts[fname] = source_counts.get(fname, 0) + 1
+    
+    if not source_counts:
+        return None
+
+    sorted_src = sorted(source_counts.items(), key=lambda x: x[1], reverse=True)
+    names = [x[0] for x in sorted_src]
+    counts = [x[1] for x in sorted_src]
+
+    fig = go.Figure(go.Bar(
+        x=counts,
+        y=names,
+        orientation='h',
+        marker=dict(color='#636EFA', line=dict(color='white', width=1))
+    ))
+
+    fig.update_layout(
+        title="Evidence Source Attribution",
+        xaxis=dict(title="Citations Count", gridcolor='rgba(255,255,255,0.1)'),
+        yaxis=dict(autorange="reversed"), # Top source at top
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    return fig
+
+# --- 6. EVIDENCE HEATMAP (Matrix) ---
+def plot_heatmap(claims):
+    """
+    Shows the strength of top 3 evidence chunks for each claim.
+    """
+    claim_labels = [f"C{i+1}" for i in range(len(claims))]
+    evidence_labels = ["Ev 1", "Ev 2", "Ev 3"] # Top 3
+    
+    z_data = []
+    text_data = []
+    
+    for c in claims:
+        # Get top 3 evidence scores (or 0 if missing)
+        row_scores = []
+        row_text = []
+        for k in range(3):
+            if k < len(c['evidence']):
+                score = c['evidence'][k]['similarity']
+                row_scores.append(score)
+                row_text.append(f"{score:.2f}")
+            else:
+                row_scores.append(0.0)
+                row_text.append("N/A")
+        z_data.append(row_scores)
+        text_data.append(row_text)
+        
+    # Transpose for easier plotting (Claims on Y axis usually better for long lists)
+    # But here we'll keep Claims on X for timeline alignment
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=list(map(list, zip(*z_data))), # Transpose
+        x=claim_labels,
+        y=evidence_labels,
+        colorscale='Viridis',
+        text=list(map(list, zip(*text_data))), # Transpose text
+        texttemplate="%{text}",
+        showscale=True
+    ))
+
+    fig.update_layout(
+        title="Evidence Strength Heatmap",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
+    return fig

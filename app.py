@@ -153,7 +153,7 @@ elif selected_page == "Dashboard":
         
         st.plotly_chart(plot_sunburst(res['claims']), use_container_width=True, key="sunburst_main")
 
-        t1, t2, t3 = st.tabs(["🛡️ Risk Inspector", "🕸️ Graph", "✨ Clean Up"])
+        t1, t2, t3 = st.tabs(["🛡️ Risk Inspector", "📈 Analytics & Graph", "✨ Clean Up"])
         
         with t1:
             for i, c in enumerate(res['claims']):
@@ -180,11 +180,34 @@ elif selected_page == "Dashboard":
                         st.caption(f"Source: {ev['source']} ({ev['similarity']:.2f})")
                         st.text(ev['text'])
 
+                        st.text(ev['text'])
+
         with t2:
-            path = create_interactive_network(res['claims'])
-            if path:
-                with open(path, 'r', encoding='utf-8') as f:
-                    components.html(f.read(), height=600, scrolling=True)
+             # --- ANALYTICS DASHBOARD ---
+             from src.visualizer import plot_trust_timeline, plot_source_attribution
+             
+             col_time, col_src = st.columns([2, 1])
+             
+             with col_time:
+                 st.plotly_chart(plot_trust_timeline(res['claims']), use_container_width=True)
+                 
+             with col_src:
+                 fig_src = plot_source_attribution(res['claims'])
+                 if fig_src:
+                     st.plotly_chart(fig_src, use_container_width=True)
+                 else:
+                     st.info("No sufficient evidence found for attribution.")
+
+             # Heatmap Row
+             from src.visualizer import plot_heatmap
+             st.plotly_chart(plot_heatmap(res['claims']), use_container_width=True)
+
+             st.divider()
+             st.markdown("#### 🕸️ Interactive Graph")
+             path = create_interactive_network(res['claims'])
+             if path:
+                 with open(path, 'r', encoding='utf-8') as f:
+                     components.html(f.read(), height=600, scrolling=True)
 
         with t3:
             green_claims = [c['claim_text'] for c in res['claims'] if c['analysis']['color'] == 'green']
